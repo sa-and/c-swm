@@ -50,6 +50,11 @@ python data_gen/physics.py --num-episodes 5000 --fname data/balls_train.h5 --see
 python data_gen/physics.py --num-episodes 1000 --fname data/balls_eval.h5 --eval --seed 2
 ```
 
+**Causal World**
+```bash
+python data_gen/physics.py --env_id CausalWorld-v0 --fname ../data/cw_train.h5 --num_episodes 500 --seed 1
+```
+
 ## Run model training and evaluation
 
 **2D Shapes**:

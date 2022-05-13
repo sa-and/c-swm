@@ -108,7 +108,7 @@ def to_one_hot(indices, max_index):
     zeros = torch.zeros(
         indices.size()[0], max_index, dtype=torch.float32,
         device=indices.device)
-    return zeros.scatter_(1, indices.unsqueeze(1), 1)
+    return zeros.scatter_(1, indices.unsqueeze(1).type(torch.int64), 1)
 
 
 def to_float(np_array):
