@@ -41,7 +41,9 @@ if __name__ == '__main__':
     parser.add_argument('--ignore-action', action='store_true', default=False,
                         help='Ignore action in GNN transition model.')
     parser.add_argument('--copy-action', action='store_true', default=False,
-                        help='Apply same action to all object slots.')
+                        help='Apply same discrete action to all object slots.')
+    parser.add_argument('--copy-cont-action', action='store_true', default=False,
+                        help='Apply same continuous action to all object slots.')
 
     parser.add_argument('--decoder', action='store_true', default=False,
                         help='Train model using decoder and pixel-based loss.')
@@ -115,6 +117,7 @@ if __name__ == '__main__':
         hinge=args.hinge,
         ignore_action=args.ignore_action,
         copy_action=args.copy_action,
+        copy_cont_action=args.copy_cont_action,
         encoder=args.encoder).to(device)
 
     model.apply(utils.weights_init)

@@ -18,7 +18,7 @@ class ContrastiveSWM(nn.Module):
     """
     def __init__(self, embedding_dim, input_dims, hidden_dim, action_dim,
                  num_objects, hinge=1., sigma=0.5, encoder='large',
-                 ignore_action=False, copy_action=False):
+                 ignore_action=False, copy_action=False, copy_cont_action=False):
         super(ContrastiveSWM, self).__init__()
 
         self.hidden_dim = hidden_dim
@@ -29,6 +29,7 @@ class ContrastiveSWM(nn.Module):
         self.sigma = sigma
         self.ignore_action = ignore_action
         self.copy_action = copy_action
+        self.copy_cont_action = copy_cont_action
         
         self.pos_loss = 0
         self.neg_loss = 0
@@ -70,7 +71,8 @@ class ContrastiveSWM(nn.Module):
             action_dim=action_dim,
             num_objects=num_objects,
             ignore_action=ignore_action,
-            copy_action=copy_action)
+            copy_action=copy_action,
+            copy_cont_action=copy_cont_action)
 
         self.width = width_height[0]
         self.height = width_height[1]
@@ -123,7 +125,7 @@ class ContrastiveSWM(nn.Module):
 class TransitionGNN(torch.nn.Module):
     """GNN-based transition function."""
     def __init__(self, input_dim, hidden_dim, action_dim, num_objects,
-                 ignore_action=False, copy_action=False, act_fn='relu'):
+                 ignore_action=False, copy_action=False, copy_cont_action=False, act_fn='relu'):
         super(TransitionGNN, self).__init__()
 
         self.input_dim = input_dim
@@ -131,6 +133,7 @@ class TransitionGNN(torch.nn.Module):
         self.num_objects = num_objects
         self.ignore_action = ignore_action
         self.copy_action = copy_action
+        self.copy_cont_action = copy_cont_action
 
         if self.ignore_action:
             self.action_dim = 0
@@ -224,16 +227,17 @@ class TransitionGNN(torch.nn.Module):
                 node_attr[row], node_attr[col], edge_attr)
 
         if not self.ignore_action:
-
-            if self.copy_action:
-                action_vec = utils.to_one_hot(
-                    action, self.action_dim).repeat(1, self.num_objects)
-                action_vec = action_vec.view(-1, self.action_dim)
+            if not self.copy_cont_action:
+                if self.copy_action:
+                    action_vec = utils.to_one_hot(
+                        action, self.action_dim).repeat(1, self.num_objects)
+                else:
+                    action_vec = utils.to_one_hot(
+                        action, self.action_dim * num_nodes)
             else:
-                action_vec = utils.to_one_hot(
-                    action, self.action_dim * num_nodes)
-                action_vec = action_vec.view(-1, self.action_dim)
+                action_vec = action.repeat(1, self.num_objects)
 
+            action_vec = action_vec.view(-1, self.action_dim)
             # Attach action to each state
             node_attr = torch.cat([node_attr, action_vec], dim=-1)
 

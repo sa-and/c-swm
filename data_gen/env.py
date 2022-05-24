@@ -121,16 +121,16 @@ if __name__ == '__main__':
 
             while True:
                 if args.env_id == 'CausalWorld-v0':
-                    replay_buffer[i]['obs'].append(np.transpose(ob[0], (2, 1, 0)))
+                    replay_buffer[i]['obs'].append(np.transpose(ob[0], (2, 1, 0)).astype('float32'))
                 else:
                     replay_buffer[i]['obs'].append(ob[1])
 
                 action = agent.act(ob, reward, done)
                 ob, reward, done, _ = env.step(action)
 
-                replay_buffer[i]['action'].append(action)
+                replay_buffer[i]['action'].append(action.astype('float32'))
                 if args.env_id == 'CausalWorld-v0':
-                    replay_buffer[i]['next_obs'].append(np.transpose(ob[0], (2, 1, 0)))
+                    replay_buffer[i]['next_obs'].append(np.transpose(ob[0], (2, 1, 0)).astype('float32'))
                 else:
                     replay_buffer[i]['next_obs'].append(ob[1])
 

@@ -52,7 +52,7 @@ python data_gen/physics.py --num-episodes 1000 --fname data/balls_eval.h5 --eval
 
 **Causal World**
 ```bash
-python data_gen/physics.py --env_id CausalWorld-v0 --fname ../data/cw_train.h5 --num_episodes 500 --seed 1
+python data_gen/env.py --env_id CausalWorld-v0 --fname ../data/cw_train.h5 --num_episodes 1000 --seed 1
 ```
 
 ## Run model training and evaluation
@@ -85,6 +85,11 @@ python eval.py --dataset data/spaceinvaders_eval.h5 --save-folder checkpoints/sp
 ```bash
 python train.py --dataset data/balls_train.h5 --encoder medium --embedding-dim 4 --num-objects 3 --ignore-action --name balls
 python eval.py --dataset data/balls_eval.h5 --save-folder checkpoints/balls --num-steps 1
+```
+
+**Causal World**
+```bash
+python train.py --dataset data/cw_train.h5 --encoder large --name cw_large --batch-size 256 --save-folder checkpoints --embedding-dim 8 --action-dim 9 --copy-cont-action
 ```
 
 ### Cite
