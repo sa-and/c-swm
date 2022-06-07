@@ -10,14 +10,15 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
     torch.backends.cudnn.deterministic = True
+    num_objects = 4
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-folder', type=str,
-                        default='checkpoints/cw_large/',
+                        default='checkpoints/cw_large2/',
                         help='folder string')
     parser.add_argument('--no-cuda', action='store_true', default=True,
                         help='Disable CUDA training.')
-    parser.add_argument('--data-file', type=str, default='data/example_stacking2_train1.pkl', help='Path of obs file.')
+    parser.add_argument('--data-file', type=str, default='data/example_stacking2_02.pkl', help='Path of obs file.')
 
     args_eval = parser.parse_args()
 
@@ -38,7 +39,8 @@ if __name__ == '__main__':
     device = torch.device('cuda' if args.cuda else 'cpu')
 
     #load image
-    image = torch.tensor(pickle.load(open(args_eval.data_file, 'rb'))[None, :]).swapaxes(1, 3).to(device)
+    file = pickle.load(open(args_eval.data_file, 'rb'))[None, :]
+    image = torch.tensor(file).swapaxes(1, 3).to(device)
 
     model = modules.ContrastiveSWM(
         embedding_dim=args.embedding_dim,
@@ -59,7 +61,7 @@ if __name__ == '__main__':
     plt.subplot(161)
     plt.imshow(image[0][0])
     plt.axis("off")
-    for i in range(5):
+    for i in range(num_objects):
         plt.subplot(162+i)
         plt.imshow(extracted_obj[0][i].detach())
         plt.axis("off")

@@ -26,6 +26,8 @@ if __name__ == '__main__':
                         help='Dataset string.')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='Disable CUDA training.')
+    parser.add_argument('--copy-cont-action', action='store_true', default=False,
+                        help='Apply same continuous action to all object slots.')
 
     args_eval = parser.parse_args()
 
@@ -66,13 +68,14 @@ if __name__ == '__main__':
         hinge=args.hinge,
         ignore_action=args.ignore_action,
         copy_action=args.copy_action,
+        copy_cont_action=args.copy_cont_action,
         encoder=args.encoder).to(device)
 
     model.load_state_dict(torch.load(model_file))
     model.eval()
 
-    # topk = [1, 5, 10]
-    topk = [1]
+    topk = [1, 5, 10]
+    #topk = [1]
     hits_at = defaultdict(int)
     num_samples = 0
     rr_sum = 0
