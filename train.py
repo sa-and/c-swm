@@ -22,14 +22,12 @@ if __name__ == '__main__':
                         help='Number of training epochs.')
     parser.add_argument('--learning-rate', type=float, default=5e-4,
                         help='Learning rate.')
-
     parser.add_argument('--encoder', type=str, default='small',
                         help='Object extrator CNN size (e.g., `small`).')
     parser.add_argument('--sigma', type=float, default=0.5,
                         help='Energy scale.')
     parser.add_argument('--hinge', type=float, default=1.,
                         help='Hinge threshold parameter.')
-
     parser.add_argument('--hidden-dim', type=int, default=512,
                         help='Number of hidden units in transition MLP.')
     parser.add_argument('--embedding-dim', type=int, default=2,
@@ -44,10 +42,8 @@ if __name__ == '__main__':
                         help='Apply same discrete action to all object slots.')
     parser.add_argument('--copy-cont-action', action='store_true', default=False,
                         help='Apply same continuous action to all object slots.')
-
     parser.add_argument('--decoder', action='store_true', default=False,
                         help='Train model using decoder and pixel-based loss.')
-
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='Disable CUDA training.')
     parser.add_argument('--seed', type=int, default=42,
@@ -61,7 +57,7 @@ if __name__ == '__main__':
     parser.add_argument('--name', type=str, default='none',
                         help='Experiment name.')
     parser.add_argument('--save-folder', type=str,
-                        default='checkpoints',
+                        default='bla',
                         help='Path to checkpoints.')
 
     args = parser.parse_args()
