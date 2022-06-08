@@ -121,7 +121,9 @@ if __name__ == '__main__':
 
             while True:
                 if args.env_id == 'CausalWorld-v0':
-                    replay_buffer[i]['obs'].append(np.transpose(ob[0], (2, 1, 0)).astype('float32'))
+                    replay_buffer[i]['obs'].append(np.transpose(ob[0], (2, 1, 0)).astype('float32'))  # swap axes
+                elif args.env_id == 'CausalWorld-v1':
+                    replay_buffer[i]['obs'].append(ob[:61].astype('float32'))  # crop goal-related part of the observation
                 else:
                     replay_buffer[i]['obs'].append(ob[1])
 
@@ -131,6 +133,8 @@ if __name__ == '__main__':
                 replay_buffer[i]['action'].append(action.astype('float32'))
                 if args.env_id == 'CausalWorld-v0':
                     replay_buffer[i]['next_obs'].append(np.transpose(ob[0], (2, 1, 0)).astype('float32'))
+                elif args.env_id == 'CausalWorld-v1':
+                    replay_buffer[i]['next_obs'].append(ob[:61].astype('float32'))  # crop goal-related part of the observation
                 else:
                     replay_buffer[i]['next_obs'].append(ob[1])
 

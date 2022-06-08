@@ -50,10 +50,16 @@ python data_gen/physics.py --num-episodes 5000 --fname data/balls_train.h5 --see
 python data_gen/physics.py --num-episodes 1000 --fname data/balls_eval.h5 --eval --seed 2
 ```
 
-**Causal World**
+**Causal World with Pixel Observations**
 ```bash
 python data_gen/env.py --env_id CausalWorld-v0 --fname data/cw_train.h5 --num_episodes 1000 --seed 1
 python data_gen/env.py --env_id CausalWorld-v0 --fname data/cw_eval.h5 --num_episodes 500 --seed 2
+```
+
+**Causal World with Structured Observations**
+```bash
+python data_gen/env.py --env_id CausalWorld-v1 --fname data/cw_structured_train.h5 --num_episodes 1000 --seed 1
+python data_gen/env.py --env_id CausalWorld-v1 --fname data/cw_structured_eval.h5 --num_episodes 500 --seed 2
 ```
 
 ## Run model training and evaluation
@@ -88,7 +94,13 @@ python train.py --dataset data/balls_train.h5 --encoder medium --embedding-dim 4
 python eval.py --dataset data/balls_eval.h5 --save-folder checkpoints/balls --num-steps 1
 ```
 
-**Causal World**
+**Causal World with Pixel Observations**
+```bash
+python train.py --dataset data/cw_train.h5 --encoder large --name cw_large --batch-size 256 --save-folder checkpoints --embedding-dim 8 --action-dim 9 --copy-cont-action
+python eval.py --dataset data/cw_eval.h5 --save-folder checkpoints/cw_large --copy-cont-action --num-steps 1
+```
+
+**Causal World with Structured Observations**
 ```bash
 python train.py --dataset data/cw_train.h5 --encoder large --name cw_large --batch-size 256 --save-folder checkpoints --embedding-dim 8 --action-dim 9 --copy-cont-action
 python eval.py --dataset data/cw_eval.h5 --save-folder checkpoints/cw_large --copy-cont-action --num-steps 1

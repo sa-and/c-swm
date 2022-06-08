@@ -38,3 +38,10 @@ register(
             'observation_mode': 'pixel',
             'camera_indicies': [0],
             'max_episode_length': 49})
+
+register(
+    'CausalWorld-v1',
+    entry_point=CausalWorld,
+    kwargs={'task': generate_task('stacking2'),
+            'enable_visualization': False,
+            'max_episode_length': 49})
