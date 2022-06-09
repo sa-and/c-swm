@@ -26,7 +26,6 @@ class ContrastiveSWM(nn.Module):
         self.action_dim = action_dim
         self.num_objects = num_objects
         self.hinge = hinge
-        self.sigma = sigma
         self.ignore_action = ignore_action
         self.copy_action = copy_action
         self.copy_cont_action = copy_cont_action
@@ -72,26 +71,17 @@ class ContrastiveSWM(nn.Module):
             num_objects=num_objects,
             ignore_action=ignore_action,
             copy_action=copy_action,
-            copy_cont_action=copy_cont_action)
+            copy_cont_action=copy_cont_action,
+            sigma=sigma)
 
         self.width = width_height[0]
         self.height = width_height[1]
 
     def energy(self, state, action, next_state, no_trans=False):
-        """Energy function based on normalized squared L2 norm."""
-
-        norm = 0.5 / (self.sigma**2)
-
-        if no_trans:
-            diff = state - next_state
-        else:
-            pred_trans = self.transition_model(state, action)
-            diff = state + pred_trans - next_state
-
-        return norm * diff.pow(2).sum(2).mean(1)
+        return self.transition_model.energy(state, action, next_state, no_trans)
 
     def transition_loss(self, state, action, next_state):
-        return self.energy(state, action, next_state).mean()
+        return self.transition_model.transition_loss(state, action, next_state)
 
     def contrastive_loss(self, obs, action, next_obs):
 
@@ -125,7 +115,7 @@ class ContrastiveSWM(nn.Module):
 class TransitionGNN(torch.nn.Module):
     """GNN-based transition function."""
     def __init__(self, input_dim, hidden_dim, action_dim, num_objects,
-                 ignore_action=False, copy_action=False, copy_cont_action=False, act_fn='relu'):
+                 sigma=0.5, ignore_action=False, copy_action=False, copy_cont_action=False, act_fn='relu'):
         super(TransitionGNN, self).__init__()
 
         self.input_dim = input_dim
@@ -134,6 +124,7 @@ class TransitionGNN(torch.nn.Module):
         self.ignore_action = ignore_action
         self.copy_action = copy_action
         self.copy_cont_action = copy_cont_action
+        self.sigma = sigma
 
         if self.ignore_action:
             self.action_dim = 0
@@ -203,6 +194,22 @@ class TransitionGNN(torch.nn.Module):
                 self.edge_list = self.edge_list.cuda()
 
         return self.edge_list
+
+    def energy(self, state, action, next_state, no_trans=False):
+        """Energy function based on normalized squared L2 norm."""
+
+        norm = 0.5 / (self.sigma**2)
+
+        if no_trans:
+            diff = state - next_state
+        else:
+            pred_trans = self.forward(state, action)
+            diff = state + pred_trans - next_state
+
+        return norm * diff.pow(2).sum(2).mean(1)
+
+    def transition_loss(self, state, action, next_state):
+        return self.energy(state, action, next_state).mean()
 
     def forward(self, states, action):
 
