@@ -59,8 +59,6 @@ if __name__ == '__main__':
     parser.add_argument('--save-folder', type=str,
                         default='bla',
                         help='Path to checkpoints.')
-    parser.add_argument('--use-structured-input', action='store_true', default=False,
-                        help='Select if input is not pixel space but structured variables.')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -105,17 +103,7 @@ if __name__ == '__main__':
     obs = train_loader.__iter__().next()[0]
     input_shape = obs[0].size()
 
-    if args.use_structured_input:
-        model = modules.TransitionGNN(
-            input_dim=1,
-            hidden_dim=args.hidden_dim,
-            action_dim=args.action_dim,
-            num_objects=args.num_objects,
-            ignore_action=args.ignore_action,
-            copy_action=args.copy_action,
-            copy_cont_action=args.copy_cont_action).to(device)
-    else:
-        model = modules.ContrastiveSWM(
+    model = modules.ContrastiveSWM(
             embedding_dim=args.embedding_dim,
             hidden_dim=args.hidden_dim,
             action_dim=args.action_dim,
@@ -134,7 +122,7 @@ if __name__ == '__main__':
         model.parameters(),
         lr=args.learning_rate)
 
-    if args.decoder and not args.use_structured_input:
+    if args.decoder:
         if args.encoder == 'large':
             decoder = modules.DecoderCNNLarge(
                 input_dim=args.embedding_dim,
@@ -188,10 +176,7 @@ if __name__ == '__main__':
                     reduction='sum') / obs.size(0)
                 loss += next_loss
             else:
-                if not args.use_structured_input:
-                    loss = model.contrastive_loss(*data_batch)
-                else:
-                    loss = model.transition_loss(*data_batch)
+                loss = model.contrastive_loss(*data_batch)
 
             loss.backward()
             train_loss += loss.item()
