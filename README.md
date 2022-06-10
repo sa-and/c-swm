@@ -102,7 +102,7 @@ python eval.py --dataset data/cw_eval.h5 --save-folder checkpoints/cw_large --co
 
 **Causal World with Structured Observations**
 ```bash
-python train.py --dataset data/cw_train.h5 --encoder large --name cw_large --batch-size 256 --save-folder checkpoints --embedding-dim 8 --action-dim 9 --copy-cont-action
+python train.py --dataset data/cw_structured_train.h5 --name cw_structured --batch-size 512 --save-folder checkpoints --epochs 200 --action-dim 9 --copy-cont-action --use-structured-input --num-objects 61
 python eval.py --dataset data/cw_eval.h5 --save-folder checkpoints/cw_large --copy-cont-action --num-steps 1
 ```
 

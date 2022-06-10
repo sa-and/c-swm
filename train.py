@@ -158,7 +158,6 @@ if __name__ == '__main__':
             decoder.parameters(),
             lr=args.learning_rate)
 
-
     # Train model.
     print('Starting model training...')
     step = 0

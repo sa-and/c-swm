@@ -1,6 +1,7 @@
 from gym.envs.registration import register
 from causal_world.envs.causalworld import CausalWorld
 from causal_world.task_generators import generate_task
+from gym.utils import seeding
 
 register(
     'ShapesTrain-v0',
