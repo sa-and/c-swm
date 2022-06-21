@@ -58,18 +58,14 @@ class ContrastiveSWM(nn.Module):
                 input_dim=num_channels,
                 hidden_dim=hidden_dim // 16,
                 num_objects=num_objects)
-
-        if encoder == 'none':
-            self.obj_extractor = nn.Identity()
-            self.obj_encoder = nn.Identity()
         else:
-            self.obj_encoder = EncoderMLP(
-                input_dim=np.prod(width_height),
-                hidden_dim=hidden_dim,
-                output_dim=embedding_dim,
-                num_objects=num_objects)
-            self.width = width_height[0]
-            self.height = width_height[1]
+            self.obj_extractor = nn.Identity()
+
+        self.obj_encoder = EncoderMLP(
+            input_dim=np.prod(width_height),
+            hidden_dim=hidden_dim,
+            output_dim=embedding_dim,
+            num_objects=num_objects)
 
         self.transition_model = TransitionGNN(
             input_dim=embedding_dim,
