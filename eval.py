@@ -28,8 +28,8 @@ if __name__ == '__main__':
                         help='Disable CUDA training.')
     parser.add_argument('--copy-cont-action', action='store_true', default=False,
                         help='Apply same continuous action to all object slots.')
-    parser.add_argument('--use-structured-input', action='store_true', default=False,
-                        help='Select if input is not pixel space but structured variables.')
+    # parser.add_argument('--use-structured-input', action='store_true', default=False,
+    #                     help='Select if input is not pixel space but structured variables.')
 
     args_eval = parser.parse_args()
 
@@ -59,28 +59,18 @@ if __name__ == '__main__':
     obs = eval_loader.__iter__().next()[0]
     input_shape = obs[0][0].size()
 
-    if args.use_structured_input:
-        model = modules.TransitionGNN(
-            input_dim=1,
-            hidden_dim=args.hidden_dim,
-            action_dim=args.action_dim,
-            num_objects=args.num_objects,
-            ignore_action=args.ignore_action,
-            copy_action=args.copy_action,
-            copy_cont_action=args.copy_cont_action).to(device)
-    else:
-        model = modules.ContrastiveSWM(
-            embedding_dim=args.embedding_dim,
-            hidden_dim=args.hidden_dim,
-            action_dim=args.action_dim,
-            input_dims=input_shape,
-            num_objects=args.num_objects,
-            sigma=args.sigma,
-            hinge=args.hinge,
-            ignore_action=args.ignore_action,
-            copy_action=args.copy_action,
-            copy_cont_action=args.copy_cont_action,
-            encoder=args.encoder).to(device)
+    model = modules.ContrastiveSWM(
+        embedding_dim=args.embedding_dim,
+        hidden_dim=args.hidden_dim,
+        action_dim=args.action_dim,
+        input_dims=input_shape,
+        num_objects=args.num_objects,
+        sigma=args.sigma,
+        hinge=args.hinge,
+        ignore_action=args.ignore_action,
+        copy_action=args.copy_action,
+        copy_cont_action=args.copy_cont_action,
+        encoder=args.encoder).to(device)
 
     model.load_state_dict(torch.load(model_file))
     model.eval()
@@ -107,19 +97,12 @@ if __name__ == '__main__':
             obs = observations[0]
             next_obs = observations[-1]
 
-            if not args.use_structured_input:
-                state = model.obj_encoder(model.obj_extractor(obs))
-                next_state = model.obj_encoder(model.obj_extractor(next_obs))
-            else:
-                state = obs
-                next_state = next_obs
+            state = model.obj_encoder(model.obj_extractor(obs))
+            next_state = model.obj_encoder(model.obj_extractor(next_obs))
 
             pred_state = state
             for i in range(args_eval.num_steps):
-                if not args.use_structured_input:
-                    pred_trans = model.transition_model(pred_state, actions[i])
-                else:
-                    pred_trans = model(pred_state, actions[i])
+                pred_trans = model.transition_model(pred_state, actions[i])
                 pred_state = pred_state + pred_trans
 
             pred_states.append(pred_state.cpu())
