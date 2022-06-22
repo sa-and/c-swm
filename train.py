@@ -59,6 +59,8 @@ if __name__ == '__main__':
     parser.add_argument('--save-folder', type=str,
                         default='bla',
                         help='Path to checkpoints.')
+    parser.add_argument('--use-ids', action='store_true', default=False,
+                        help='Adds a one-hot identifier to each observation')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -102,6 +104,10 @@ if __name__ == '__main__':
     # Get data sample
     obs = train_loader.__iter__().next()[0]
     input_shape = obs[0].size()
+    # create one-hot id's
+    if args.use_ids:
+        id_tensor = torch.diag(torch.ones(input_shape[0]))[None, :].to(device)
+        input_shape = [input_shape[0], input_shape[0]+1]
 
     model = modules.ContrastiveSWM(
             embedding_dim=args.embedding_dim,
@@ -157,6 +163,9 @@ if __name__ == '__main__':
 
         for batch_idx, data_batch in enumerate(train_loader):
             data_batch = [tensor.to(device) for tensor in data_batch]
+            if args.use_ids:
+                data_batch[0] = torch.cat([data_batch[0], id_tensor.repeat(data_batch[0].size()[0], 1, 1)], dim=2)
+                data_batch[-1] = torch.cat([data_batch[-1], id_tensor.repeat(data_batch[-1].size()[0], 1, 1)], dim=2)
             optimizer.zero_grad()
 
             if args.decoder:
